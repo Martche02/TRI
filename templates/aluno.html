@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Entrada do Aluno</title>
+</head>
+<body>
+    <h1>Entrada do Aluno</h1>
+    <form id="studentInputForm">
+        <p>Marque suas respostas:</p>
+        <div id="questions"></div>
+        <button type="submit">Obter Nota</button>
+    </form>
+
+    <script>
+        // Gerar campos de resposta do aluno
+        const questionsDiv = document.getElementById('questions');
+        for (let i = 1; i <= 25; i++) {
+            questionsDiv.innerHTML += `
+                <label for="question${i}">Questão ${i}:</label>
+                <select id="question${i}" name="question${i}">
+                    <option value="">--Selecione--</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                </select><br/>
+            `;
+        }
+
+        document.getElementById('studentInputForm').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const answers = {};
+            for (let [key, value] of formData.entries()) {
+                answers[key] = value;
+            }
+
+            fetch('/calculate_score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ answers: answers })
+            })
+            .then(response => response.json())
+            .then(data => alert('Sua nota é: ' + data.score))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
