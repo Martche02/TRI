@@ -8,37 +8,15 @@
     <h1>Upload de CSV para Professores</h1>
     <form id="uploadForm" enctype="multipart/form-data">
         <input type="file" name="file" accept=".csv" required>
-        <h2>Insira o gabarito:</h2>
-        <div id="answerKey"></div>
-        <button type="submit">Processar e Salvar Gabarito</button>
+        <input type="text" name="Nome Do Exame" placeholder="Nome Do Exame" required>
+        <button type="submit">Processar e Salvar Dados</button>
     </form>
 
     <script>
-        // Gerar gabarito de questões
-        const answerKeyDiv = document.getElementById('answerKey');
-        for (let i = 1; i <= 25; i++) {
-            answerKeyDiv.innerHTML += `
-                <label for="answer${i}">Questão ${i}:</label>
-                <select id="answer${i}" name="answer${i}">
-                    <option value="">--Selecione--</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="E">E</option>
-                </select><br/>
-            `;
-        }
-
-        // Enviar CSV e Gabarito
+        // Enviar CSV e Nome do Exame
         document.getElementById('uploadForm').onsubmit = function(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const answers = {};
-            for (let i = 1; i <= 25; i++) {
-                answers[`answer${i}`] = document.getElementById(`answer${i}`).value;
-            }
-            formData.append('answers', JSON.stringify(answers));
 
             fetch('/upload_csv', {
                 method: 'POST',

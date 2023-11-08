@@ -6,7 +6,13 @@
 </head>
 <body>
     <h1>Entrada do Aluno</h1>
-    <form id="studentInputForm">
+    <form id="studentInputForm" method="post" action="/calculate_score">
+        <p>Selecione o exame:</p>
+        <select name="exam_name" id="exam_name">
+            {% for name in exam_names %}
+            <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+        </select>
         <p>Marque suas respostas:</p>
         <div id="questions"></div>
         <button type="submit">Obter Nota</button>
@@ -16,38 +22,42 @@
         // Gerar campos de resposta do aluno
         const questionsDiv = document.getElementById('questions');
         for (let i = 1; i <= 25; i++) {
-            questionsDiv.innerHTML += `
-                <label for="question${i}">Questão ${i}:</label>
-                <select id="question${i}" name="question${i}">
-                    <option value="">--Selecione--</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="E">E</option>
-                </select><br/>
-            `;
+            questionsDiv.innerHTML += `<label for="question${i}">Questão ${i}:</label>
+            <select id="question${i}" name="question${i}">
+                <option value="">--Selecione--</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+            </select><br/>`;
         }
 
+        // Alterar o comportamento de submissão do formulário para incluir a seleção do exame
         document.getElementById('studentInputForm').onsubmit = function(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
             const answers = {};
-            for (let [key, value] of formData.entries()) {
+            formData.forEach((value, key) => {
                 answers[key] = value;
-            }
-
-            fetch('/calculate_score', {
-                method: 'POST',
+            });
+            fetch(this.action, {
+                method: this.method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ answers: answers })
+                body: JSON.stringify(answers)
             })
             .then(response => response.json())
-            .then(data => alert('Sua nota é: ' + data.score))
-            .catch(error => console.error('Error:', error));
-        }
+            .then(data => {
+                // Tratar a resposta aqui, por exemplo:
+                alert('Sua nota é: ' + data.score);
+            })
+            .catch(error => {
+                // Tratar o erro aqui
+                console.error('Error:', error);
+            });
+        };
     </script>
 </body>
 </html>
